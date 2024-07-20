@@ -16,16 +16,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->enum('role', ['Student', 'Teacher', 'Admin'])->default('Student');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
         });
-        };
-        if (Schema::hasTable('users') && !Schema::hasColumn('users', 'role')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->enum('role', ['Student', 'Teacher', 'Admin'])->default('Student');
-            });
         };
 
         if (!Schema::hasTable('password_reset_tokens')) {
