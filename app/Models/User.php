@@ -17,7 +17,7 @@ class User extends Authenticatable implements JWTSubject{
      * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role',
+        'name', 'email', 'password', 'role_id',
     ];
 
     /**
@@ -51,5 +51,26 @@ class User extends Authenticatable implements JWTSubject{
         ];
     }
 
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function toArray()
+    {
+        $array = parent::toArray();
+
+        // Eager load role and permissions
+        $role = $this->role()->with('permissions')->first();
+        $permissions = $role ? $role->permissions->pluck('name')->toArray() : [];
+
+        // Add role and permissions to the array
+        $array['role'] = [
+            'name' => $role ? $role->name : null,
+            'permissions' => $permissions
+        ];
+
+        return $array;
+    }
 
 }

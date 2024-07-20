@@ -9,12 +9,14 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
+
         return response()->json($users);
     }
 
     public function show($id)
     {
         $user = User::find($id);
+
         if (!$user) {
             return response()->json(['error' => 'User not found.'], 404);
         }

@@ -14,7 +14,7 @@ class RoleMiddleware
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (! $user || $user->role !== $role) {
+            if (! $user || $user->role->name !== $role) {
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
         } catch (JWTException $e) {

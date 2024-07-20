@@ -27,27 +27,43 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        // Validate incoming request data
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
-            'role' => 'required|in:Student,Teacher,Admin',
+            'role_id' => 'required|exists:roles,id', // Ensure role exists in the roles table
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 400);
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 400);
         }
 
+        // Retrieve the validated input data
+        $data = $validator->validated();
+
+        // Create new user
         $user = User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => bcrypt($request->input('password')),
-            'role' => $request->input('role'),
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => bcrypt($data['password']), // Use Hash facade for password hashing
+            'role_id' => $data['role_id'], // Ensure role_id is passed correctly
         ]);
 
+        // Generate JWT token
         $token = JWTAuth::fromUser($user);
 
-        return response()->json(compact('token'));
+        // Return the response with the token
+        return response()->json([
+            'status' => 'success',
+            'data' => [
+                'user' => $user,
+                'token' => $token
+            ]
+        ]);
     }
 
     public function refresh()
@@ -62,9 +78,18 @@ class AuthController extends Controller
     public function getCurrentUser()
     {
         try {
-            if (! $user = JWTAuth::parseToken()->authenticate()) {
+            // Authenticate the user
+            if (!$user = JWTAuth::parseToken()->authenticate()) {
                 return response()->json(['user_not_found'], 404);
             }
+
+            // Convert the user to an array, including the role and permissions
+            $userArray = $user->toArray();
+
+            // Build the response array
+            $response = [
+                'user' => $userArray // The user data now includes role and permissions
+            ];
         } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             return response()->json(['token_expired'], $e->getStatusCode());
         } catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
@@ -73,6 +98,10 @@ class AuthController extends Controller
             return response()->json(['token_absent'], $e->getStatusCode());
         }
 
-        return response()->json(compact('user'));
+
+        // Return the user with the role and permissions information
+        return response()->json($response);
     }
+
+
 }
