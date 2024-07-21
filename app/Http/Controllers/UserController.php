@@ -51,15 +51,15 @@ class UserController extends Controller
         $request->validate([
             'name' => 'string',
             'email' => 'email|unique:users,email,'.$user->id,
-            'password' => 'string|min:6',
-            'role' => 'nullable|string',
+            'password' => 'nullable|string|min:6', // Password is now optional
+            'role_id' => 'nullable|integer|exists:roles,id',
         ]);
 
         $user->update([
             'name' => $request->name ?? $user->name,
             'email' => $request->email ?? $user->email,
-            'password' => isset($request->password) ? bcrypt($request->password) : $user->password,
-            'role' => $request->role ?? $user->role,
+            'password' => $request->has('password') ? bcrypt($request->password) : $user->password,
+            'role_id' => $request->role_id ?? $user->role_id,
         ]);
 
         return response()->json($user);
