@@ -12,6 +12,24 @@ class UserController extends Controller
 
         return response()->json($users);
     }
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:6|confirmed',
+            'role_id' => 'required|integer|exists:roles,id',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role_id' => $request->role_id,
+        ]);
+
+        return response()->json($user, 201);
+    }
 
     public function show($id)
     {
