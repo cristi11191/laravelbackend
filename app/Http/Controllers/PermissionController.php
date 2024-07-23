@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Permission;
+use App\Models\RolePermission;
 use Illuminate\Http\Request;
 
 class PermissionController extends Controller
@@ -59,6 +60,8 @@ class PermissionController extends Controller
         if (!$permission) {
             return response()->json(['error' => 'Permission not found.'], 404);
         }
+
+        RolePermission::where('permission_id', $permission->id)->delete();
 
         $permission->delete();
 
