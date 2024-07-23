@@ -13,11 +13,11 @@ Route::post('refresh',[AuthController::class, 'refresh']);
 Route::middleware('isAuthApi')->group(function () {
     Route::get('current-user', [AuthController::class, 'getCurrentUser']);
 
-    Route::get('users', [UserController::class, 'index']);
-    Route::get('users/{id}', [UserController::class, 'show']);
-    Route::post('users', [UserController::class, 'store']);
-    Route::put('users/{id}', [UserController::class, 'update']);
-    Route::delete('users/{id}', [UserController::class, 'destroy']);
+    Route::get('users', [UserController::class, 'index'])->middleware('permission:read_user');
+    Route::get('users/{id}', [UserController::class, 'show'])->middleware('permission:read_user');
+    Route::post('users', [UserController::class, 'store'])->middleware('permission:create_user');
+    Route::put('users/{id}', [UserController::class, 'update'])->middleware('permission:update_user');
+    Route::delete('users/{id}', [UserController::class, 'destroy'])->middleware('permission:delete_user');
 
     Route::get('roles', [RoleController::class, 'all'])->middleware('permission:read_role');
     Route::get('roles/{id}', [RoleController::class, 'show'])->middleware('permission:read_role');
@@ -38,10 +38,6 @@ Route::middleware('isAuthApi')->group(function () {
     Route::delete('/role-permissions', [RolePermissionController::class, 'destroy'])->middleware('permission:update_role');
 
     Route::post('register', [AuthController::class, 'register']);
-});
-
-Route::group(['middleware' => ['isAuthApi', 'permission:view_dashboard']], function () {
-    Route::get('/dashboard', [DashboardController::class, 'index']);
 });
 
 
