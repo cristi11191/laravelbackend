@@ -14,6 +14,7 @@ return new class extends Migration
         if (!Schema::hasTable('permissions')) {
             Schema::create('permissions', function (Blueprint $table) {
                 $table->id();
+                $table->string('name');
                 $table->timestamps();
             });
         }

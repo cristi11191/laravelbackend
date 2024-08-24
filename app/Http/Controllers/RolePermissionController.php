@@ -1,45 +1,114 @@
 <?php
-// RolePermissionController.php
 
-namespace App\Http\Controllers;
+namespace Database\Seeders;
 
-use Illuminate\Http\Request;
-use App\Models\RolePermission;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Role;
+use App\Models\Permission;
+use App\Models\User;
+use App\Models\RolePermission; // Make sure this is imported
 
-class RolePermissionController extends Controller
+class RolesAndUsersSeeder extends Seeder
 {
-    // Store role-permission relationships
-    public function store(Request $request)
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
     {
-        $request->validate([
-            'role_id' => 'required|integer|exists:roles,id',
-            'permissions' => 'array',
-            'permissions.*' => 'integer|exists:permissions,id',
-        ]);
+        // Step 1: Create Permissions
+        $permissions = [
+            'view_dashboard',
+            'view_adminpanel',
+            'read_user',
+            'create_user',
+            'update_user',
+            'delete_user',
+            'read_role',
+            'create_role',
+            'update_role',
+            'delete_role',
+            'read_permission',
+            'create_permission',
+            'update_permission',
+            'delete_permission',
+        ];
 
-        foreach ($request->permissions as $permissionId) {
-            RolePermission::create([
-                'role_id' => $request->role_id,
-                'permission_id' => $permissionId,
-            ]);
+        foreach ($permissions as $perm) {
+            // Check if the permission already exists
+            if (!Permission::where('name', $perm)->exists()) {
+                Permission::create(['name' => $perm]);
+            }
         }
 
-        return response()->json(['message' => 'Permissions added successfully'], 201);
-    }
+        // Step 2: Create Roles and Attach Permissions
+        $roles = [
+            'admin' => [
+                'permissions' => $permissions, // Admin has all permissions
+            ],
+            'secretary' => [
+                'permissions' => [
+                    'view_dashboard',
+                    'view_adminpanel',
+                    'read_user',
+                    'create_user',
+                    'update_user',
+                    'delete_user',
+                ],
+            ],
+            'teacher' => [
+                'permissions' => [
+                    'view_dashboard',
+                    'read_user',
+                    'create_user',
+                    'update_user',
+                ],
+            ],
+            'student' => [
+                'permissions' => [
+                    'view_dashboard',
+                ],
+            ],
+        ];
 
-    // Detach permissions from a role
-    public function destroy(Request $request)
-    {
-        $request->validate([
-            'role_id' => 'required|integer|exists:roles,id',
-            'permissions' => 'array',
-            'permissions.*' => 'integer|exists:permissions,id',
-        ]);
+        foreach ($roles as $roleName => $roleData) {
+            $role = Role::create(['name' => ucfirst($roleName)]); // Capitalize role names
 
-        RolePermission::where('role_id', $request->role_id)
-            ->whereIn('permission_id', $request->permissions)
-            ->delete();
+            // Attach permissions to the role
+            foreach ($roleData['permissions'] as $perm) {
+                $permission = Permission::where('name', $perm)->first();
+                if ($permission) {
+                    RolePermission::create([
+                        'role_id' => $role->id,
+                        'permission_id' => $permission->id,
+                    ]);
+                }
+            }
+        }
 
-        return response()->json(['message' => 'Permissions removed successfully'], 200);
+        // Step 3: Create Users
+        $users = [
+            [
+                "name" => "John Doe",
+                "email" => "test@test.com",
+                "password" => "secret",
+                "role_id" => 4, // Assuming this is Student
+            ],
+            [
+                "name" => "Brad Pitt",
+                "email" => "test1@test.com",
+                "password" => "secret",
+                "role_id" => 1, // Assuming this is Admin
+            ],
+        ];
+
+        foreach ($users as $userData) {
+            User::create([
+                'name' => $userData['name'],
+                'email' => $userData['email'],
+                'password' => Hash::make($userData['password']), // Hash the password
+                'role_id' => $userData['role_id'],
+            ]);
+        }
     }
 }
