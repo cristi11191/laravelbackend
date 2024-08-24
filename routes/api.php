@@ -10,6 +10,7 @@ use App\Http\Controllers\AuthController;
 
 Route::post('login', [AuthController::class, 'login']);
 Route::post('refresh',[AuthController::class, 'refresh']);
+Route::post('register', [AuthController::class, 'register']);
 Route::middleware('isAuthApi')->group(function () {
     Route::get('current-user', [AuthController::class, 'getCurrentUser']);
 
@@ -37,7 +38,7 @@ Route::middleware('isAuthApi')->group(function () {
     Route::post('/role-permissions', [RolePermissionController::class, 'store'])->middleware('permission:update_role');
     Route::delete('/role-permissions', [RolePermissionController::class, 'destroy'])->middleware('permission:update_role');
 
-    Route::post('register', [AuthController::class, 'register']);
+
 });
 
 
