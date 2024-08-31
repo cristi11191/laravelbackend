@@ -19,7 +19,7 @@ class RolesAndUsersSeeder extends Seeder
         // Step 1: Create Permissions
         $permissions = [
             'view_dashboard',
-            'view_adminpanel',
+            'view_admin',
             'read_user',
             'create_user',
             'update_user',
@@ -49,7 +49,7 @@ class RolesAndUsersSeeder extends Seeder
             'secretary' => [
                 'permissions' => [
                     'view_dashboard',
-                    'view_adminpanel',
+                    'view_admin',
                     'read_user',
                     'create_user',
                     'update_user',
