@@ -10,7 +10,7 @@ class PermissionSeeder extends Seeder
         $adminRole = Role::where('name', 'Admin')->first();
         $viewDashboard = Permission::where('name', 'view_dashboard')->first();
         $adminRole->permissions()->attach($viewDashboard);
-        $viewAdminPanel = Permission::where('name', 'view_adminpanel')->first();
+        $viewAdminPanel = Permission::where('name', 'view_admin')->first();
         $adminRole->permissions()->attach($viewAdminPanel);
     }
 }

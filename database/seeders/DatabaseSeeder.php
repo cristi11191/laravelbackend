@@ -14,11 +14,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('users')->truncate();
-            DB::table('roles')->truncate();
-            DB::table('permissions')->truncate();
-            DB::table('role_permission')->truncate();
-
-            $this->call(RolesAndUsersSeeder::class);
+        $this->call([
+            RolesTableSeeder::class,
+            PermissionsTableSeeder::class,
+            RolePermissionsTableSeeder::class,
+            UsersTableSeeder::class,
+        ]);
     }
 }

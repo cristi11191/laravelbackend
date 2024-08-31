@@ -43,10 +43,10 @@ class RolesAndUsersSeeder extends Seeder
 
         // Step 2: Create Roles and Attach Permissions
         $roles = [
-            'admin' => [
+            'Admin' => [
                 'permissions' => $permissions, // Admin has all permissions
             ],
-            'secretary' => [
+            'Secretary' => [
                 'permissions' => [
                     'view_dashboard',
                     'view_admin',
@@ -56,7 +56,7 @@ class RolesAndUsersSeeder extends Seeder
                     'delete_user',
                 ],
             ],
-            'teacher' => [
+            'Teacher' => [
                 'permissions' => [
                     'view_dashboard',
                     'read_user',
@@ -64,7 +64,7 @@ class RolesAndUsersSeeder extends Seeder
                     'update_user',
                 ],
             ],
-            'student' => [
+            'Student' => [
                 'permissions' => [
                     'view_dashboard',
                 ],
