@@ -10,15 +10,17 @@ use App\Http\Controllers\AuthController;
 
 Route::post('login', [AuthController::class, 'login']);
 Route::post('refresh',[AuthController::class, 'refresh']);
-Route::post('register', [AuthController::class, 'register']);
+
 Route::middleware('isAuthApi')->group(function () {
     Route::get('current-user', [AuthController::class, 'getCurrentUser']);
+    Route::post('register', [AuthController::class, 'register'])->middleware('permission:create_user');
 
     Route::get('users', [UserController::class, 'index'])->middleware('permission:read_user');
     Route::get('users/{id}', [UserController::class, 'show'])->middleware('permission:read_user');
     Route::post('users', [UserController::class, 'store'])->middleware('permission:create_user');
     Route::put('users/{id}', [UserController::class, 'update'])->middleware('permission:update_user');
     Route::delete('users/{id}', [UserController::class, 'destroy'])->middleware('permission:delete_user');
+
 
     Route::get('roles', [RoleController::class, 'all'])->middleware('permission:read_role');
     Route::get('roles/{id}', [RoleController::class, 'show'])->middleware('permission:read_role');
