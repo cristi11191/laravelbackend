@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\RolePermissionController;
@@ -40,6 +41,11 @@ Route::middleware('isAuthApi')->group(function () {
     Route::post('/role-permissions', [RolePermissionController::class, 'store'])->middleware('permission:update_role');
     Route::delete('/role-permissions', [RolePermissionController::class, 'destroy'])->middleware('permission:update_role');
 
+    Route::get('groups', [GroupController::class, 'all'])->middleware('permission:read_group');
+    Route::get('groups/{id}', [GroupController::class, 'get'])->middleware('permission:read_group');
+    Route::post('groups', [GroupController::class, 'create'])->middleware('permission:create_group');
+    Route::put('groups/{id}', [GroupController::class, 'update'])->middleware('permission:update_group');
+    Route::delete('groups/{id}', [GroupController::class, 'delete'])->middleware('permission:delete_group');
 
 });
 
