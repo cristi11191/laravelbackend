@@ -29,8 +29,6 @@ Route::middleware('isAuthApi')->group(function () {
     Route::put('roles/{id}', [RoleController::class, 'update'])->middleware('permission:update_role');
     Route::delete('roles/{id}', [RoleController::class, 'destroy'])->middleware('permission:delete_role');
     Route::get('roles/{id}/permissions', [RoleController::class, 'getPermissions'])->middleware('permission:read_role');
-    Route::put('/roles/{id}/permissions', [RoleController::class, 'updatePermissions'])->middleware('permission:update_role');
-
 
     Route::get('permissions', [PermissionController::class, 'all'])->middleware('permission:read_permission');
     Route::get('permissions/{id}', [PermissionController::class, 'show'])->middleware('permission:read_permission');
@@ -38,8 +36,6 @@ Route::middleware('isAuthApi')->group(function () {
     Route::put('permissions/{id}', [PermissionController::class, 'update'])->middleware('permission:update_permission');
     Route::delete('permissions/{id}', [PermissionController::class, 'destroy'])->middleware('permission:delete_user');
 
-    Route::post('/role-permissions', [RolePermissionController::class, 'store'])->middleware('permission:update_role');
-    Route::delete('/role-permissions', [RolePermissionController::class, 'destroy'])->middleware('permission:update_role');
 
     Route::get('groups', [GroupController::class, 'all'])->middleware('permission:read_group');
     Route::get('groups/{id}', [GroupController::class, 'get'])->middleware('permission:read_group');

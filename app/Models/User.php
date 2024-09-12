@@ -56,21 +56,37 @@ class User extends Authenticatable implements JWTSubject{
         return $this->belongsTo(Role::class);
     }
 
+
     public function toArray()
     {
+        // Call the parent toArray method
         $array = parent::toArray();
 
-        // Eager load role and permissions
-        $role = $this->role()->with('permissions')->first();
-        $permissions = $role ? $role->permissions->pluck('name')->toArray() : [];
+        // Add role and permissions to the array
+        $role = $this->role; // Assuming role is already loaded
+
+        // Initialize permissions array
+        $permissionNames = [];
+
+        // Check if role is loaded and has permissions
+        if ($role) {
+            // Get the permissions directly from the role
+            $permissionNames = $role->permissions; // This should directly give the array of names
+        }
 
         // Add role and permissions to the array
         $array['role'] = [
             'name' => $role ? $role->name : null,
-            'permissions' => $permissions
+            'permissions' => $permissionNames
         ];
 
         return $array;
     }
+
+
+
+
+
+
 
 }

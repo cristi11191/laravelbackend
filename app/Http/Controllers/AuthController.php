@@ -81,28 +81,52 @@ class AuthController extends Controller
         try {
             // Authenticate the user
             if (!$user = JWTAuth::parseToken()->authenticate()) {
-                return response()->json(['user_not_found'], 404);
+                return response()->json(['error' => 'User not found'], 404);
             }
+
+            // Load the user's role
+            $user->load('role'); // Eager-load role
 
             // Convert the user to an array, including the role and permissions
             $userArray = $user->toArray();
 
+            // Debug: Check the structure of role
+            \Log::info('User Role:', [$userArray['role']]);
+
+            // Ensure permissions are an array
+            $permissions = is_array($userArray['role']['permissions']) ? $userArray['role']['permissions'] : [];
+
             // Build the response array
             $response = [
-                'user' => $userArray // The user data now includes role and permissions
+                'user' => [
+                    'id' => $userArray['id'], // Include user ID
+                    'name' => $userArray['name'], // Include other user attributes as needed
+                    'email' => $userArray['email'], // Example of including email
+                    'role' => [
+                        'name' => $userArray['role']['name'], // Role name
+                        'permissions' => $permissions // Directly assign permissions
+                    ]
+                ]
             ];
-        } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-            return response()->json(['token_expired'], $e->getStatusCode());
-        } catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-            return response()->json(['token_invalid'], $e->getStatusCode());
-        } catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
-            return response()->json(['token_absent'], $e->getStatusCode());
-        }
 
+        } catch (Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+            return response()->json(['error' => 'Token expired'], $e->getStatusCode());
+        } catch (Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+            return response()->json(['error' => 'Token invalid'], $e->getStatusCode());
+        } catch (Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json(['error' => 'Token absent'], $e->getStatusCode());
+        } catch (\Exception $e) {
+            \Log::error('An error occurred:', [$e->getMessage()]);
+            return response()->json(['error' => 'An internal error occurred'], 500);
+        }
 
         // Return the user with the role and permissions information
         return response()->json($response);
     }
+
+
+
+
 
 
 }

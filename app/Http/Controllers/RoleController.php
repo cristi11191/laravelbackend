@@ -27,61 +27,37 @@ class RoleController extends Controller
     }
     public function store(Request $request)
     {
-        // Validate request
         $request->validate([
-            'name' => 'required|string|unique:roles,name',
-            'permissions' => 'array', // Permissions should be an array
-            'permissions.*' => 'integer|exists:permissions,id', // Ensure each permission ID is valid
+            'name' => 'required|string|max:255',
+            'permissions' => 'nullable|array', // Validating permissions as an array
+            'permissions.*' => 'integer', // Each permission should be an integer (ID)
         ]);
 
-        // Create role
-        $role = Role::create([
-            'name' => $request->name,
-        ]);
+        $role = new Role();
+        $role->name = $request->name;
+        $role->permissions = $request->permissions ?? []; // Store the permissions array
+        $role->save();
 
-        // Attach permissions to the role
-        if ($request->has('permissions') && !empty($request->permissions)) {
-            foreach ($request->permissions as $permissionId) {
-                RolePermission::create([
-                    'role_id' => $role->id,
-                    'permission_id' => $permissionId,
-                ]);
-            }
-        }
-
-        return response()->json($role->load('permissions'), 201);
+        return response()->json($role, 201);
     }
 
 
     public function update(Request $request, $id)
     {
-        $role = Role::find($id);
-        if (!$role) {
-            return response()->json(['error' => 'Role not found.'], 404);
-        }
-
         $request->validate([
-            'name' => 'string|unique:roles,name,'.$role->id,
-            'permissions' => 'array',
-            'permissions.*' => 'exists:permissions,id'
+            'name' => 'required|string|max:255',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'string',
         ]);
 
-        $role->update([
-            'name' => $request->name ?? $role->name,
-        ]);
-
-        if ($request->has('permissions')) {
-            RolePermission::where('role_id', $role->id)->delete();
-            foreach ($request->permissions as $permission_id) {
-                RolePermission::create([
-                    'role_id' => $role->id,
-                    'permission_id' => $permission_id,
-                ]);
-            }
-        }
+        $role = Role::findOrFail($id);
+        $role->name = $request->name;
+        $role->permissions = $request->input('permissions'); // Store permissions as JSON
+        $role->save();
 
         return response()->json($role);
     }
+
 
     public function destroy($id)
     {
@@ -90,22 +66,22 @@ class RoleController extends Controller
             return response()->json(['error' => 'Role not found.'], 404);
         }
 
-        RolePermission::where('role_id', $role->id)->delete();
         $role->delete();
 
         return response()->json(['message' => 'Role deleted successfully']);
     }
-    public function getPermissions($id)
+    public function getPermissions($roleId)
     {
-        $role = Role::find($id);
+        // Find the role by ID
+        $role = Role::findOrFail($roleId);
 
-        if (!$role) {
-            return response()->json(['error' => 'Role not found.'], 404);
-        }
-
-        $permissions = $role->permissions;
-        return response()->json($permissions);
+        // Return a JSON response with the role's permissions
+        return response()->json([
+            'role_id' => $role->id,
+            'permissions' => $role->permissions, // This will return the permissions array
+        ], 200);
     }
+
     /**
      * Update the permissions for a specific role.
      *
@@ -113,34 +89,27 @@ class RoleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updatePermissions(Request $request, $id)
+    public function updateRole(Request $request, $id)
     {
-        \Log::info('Updating permissions for role ID: '.$id); // Log the role ID
-
-        $role = Role::find($id);
-        if (!$role) {
-            return response()->json(['error' => 'Role not found.'], 404);
-        }
-
-        // Validate request
+        // Validate the incoming request data
         $request->validate([
-            'permissions' => 'array',
-            'permissions.*' => 'integer|exists:permissions,id',
+            'name' => 'required|string|max:255',
+            'permissions' => 'array' // Ensure permissions is an array
         ]);
 
-        // Remove old permissions
-        RolePermission::where('role_id', $role->id)->delete();
-
-        // Attach new permissions
-        if ($request->has('permissions') && !empty($request->permissions)) {
-            foreach ($request->permissions as $permissionId) {
-                RolePermission::create([
-                    'role_id' => $role->id,
-                    'permission_id' => $permissionId,
-                ]);
-            }
+        // Check user permissions
+        if (!auth()->user()->hasPermission('update_role')) {
+            return response()->json(['error' => 'Forbidden'], 403);
         }
 
-        return response()->json(['message' => 'Permissions updated successfully']);
+        // Find the role and update it
+        $role = Role::findOrFail($id);
+        $role->name = $request->input('name');
+        $role->permissions = json_encode($request->input('permissions')); // Assuming permissions is a JSON column
+        $role->save();
+
+        return response()->json(['message' => 'Role updated successfully']);
     }
+
+
 }
