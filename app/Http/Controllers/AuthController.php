@@ -93,9 +93,6 @@ class AuthController extends Controller
             // Debug: Check the structure of role
             \Log::info('User Role:', [$userArray['role']]);
 
-            // Ensure permissions are an array
-            $permissions = is_array($userArray['role']['permissions']) ? $userArray['role']['permissions'] : [];
-
             // Build the response array
             $response = [
                 'user' => [
@@ -103,8 +100,7 @@ class AuthController extends Controller
                     'name' => $userArray['name'], // Include other user attributes as needed
                     'email' => $userArray['email'], // Example of including email
                     'role' => [
-                        'name' => $userArray['role']['name'], // Role name
-                        'permissions' => $permissions // Directly assign permissions
+                        'name' => $userArray['role']['name']
                     ]
                 ]
             ];

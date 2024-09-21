@@ -65,19 +65,10 @@ class User extends Authenticatable implements JWTSubject{
         // Add role and permissions to the array
         $role = $this->role; // Assuming role is already loaded
 
-        // Initialize permissions array
-        $permissionNames = [];
-
-        // Check if role is loaded and has permissions
-        if ($role) {
-            // Get the permissions directly from the role
-            $permissionNames = $role->permissions; // This should directly give the array of names
-        }
 
         // Add role and permissions to the array
         $array['role'] = [
-            'name' => $role ? $role->name : null,
-            'permissions' => $permissionNames
+            'name' => $role ? $role->name : null
         ];
 
         return $array;
