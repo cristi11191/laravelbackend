@@ -9,12 +9,13 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 class RoleMiddleware
 {
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
 
-            if (! $user || $user->role->name !== $role) {
+            // Ensure that user is authenticated and their role matches one of the allowed roles
+            if (! $user || ! in_array($user->role->name, $roles)) {
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
         } catch (JWTException $e) {

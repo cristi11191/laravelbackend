@@ -16,8 +16,8 @@ Route::middleware('isAuthApi')->group(function () {
     Route::get('current-user', [AuthController::class, 'getCurrentUser']);
     Route::post('register', [AuthController::class, 'register'])->middleware('role:Admin');
 
-    Route::get('users', [UserController::class, 'index'])->middleware('role:Admin,Secretary');
-    Route::get('users/{id}', [UserController::class, 'show'])->middleware('role:Admin,Secretary');
+    Route::get('users', [UserController::class, 'index'])->middleware('role:Admin');
+    Route::get('users/{id}', [UserController::class, 'show'])->middleware('role:Admin');
     Route::post('users', [UserController::class, 'store'])->middleware('role:Admin');
     Route::put('users/{id}', [UserController::class, 'update'])->middleware('role:Admin');
     Route::delete('users/{id}', [UserController::class, 'destroy'])->middleware('role:Admin');
