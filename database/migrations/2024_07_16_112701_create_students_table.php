@@ -18,8 +18,8 @@ return new class extends Migration
                 $table->string('full_name');
                 $table->string('student_number');
                 $table->string('email')->nullable();
-                $table->foreignId('group')->constrained('groups')->onDelete('cascade');
-                $table->foreignId('series')->constrained('series')->onDelete('cascade');
+                $table->foreignId('group_id')->constrained('groups')->onDelete('cascade');
+                $table->foreignId('series_id')->constrained('series')->onDelete('cascade');
                 $table->integer('year');
                 $table->integer('semester');
                 $table->string('faculty');

@@ -4,6 +4,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SeriesController;
+use App\Http\Controllers\StudentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
@@ -16,18 +17,23 @@ Route::middleware('isAuthApi')->group(function () {
     Route::get('current-user', [AuthController::class, 'getCurrentUser']);
     Route::post('register', [AuthController::class, 'register'])->middleware('role:Admin');
 
-    Route::get('users', [UserController::class, 'index'])->middleware('role:Admin');
-    Route::get('users/{id}', [UserController::class, 'show'])->middleware('role:Admin');
-    Route::post('users', [UserController::class, 'store'])->middleware('role:Admin');
-    Route::put('users/{id}', [UserController::class, 'update'])->middleware('role:Admin');
-    Route::delete('users/{id}', [UserController::class, 'destroy'])->middleware('role:Admin');
+    Route::get('users', [UserController::class, 'index'])->middleware('role:Admin,Secretary');
+    Route::get('users/{id}', [UserController::class, 'show'])->middleware('role:Admin,Secretary');
+    Route::post('users', [UserController::class, 'store'])->middleware('role:Admin,Secretary');
+    Route::put('users/{id}', [UserController::class, 'update'])->middleware('role:Admin,Secretary');
+    Route::delete('users/{id}', [UserController::class, 'destroy'])->middleware('role:Admin,Secretary');
 
-    Route::get('roles', [RoleController::class, 'all'])->middleware('role:Admin');
-    Route::get('roles/{id}', [RoleController::class, 'show'])->middleware('role:Admin');
+    Route::get('students', [StudentController::class, 'index'])->middleware('role:Admin,Secretary');
+    Route::get('students/{id}', [StudentController::class, 'showUserId'])->middleware('role:Admin,Secretary');
+    Route::post('students', [StudentController::class, 'store'])->middleware('role:Admin,Secretary');
+    Route::put('students/{id}', [StudentController::class, 'update'])->middleware('role:Admin,Secretary');
+    Route::delete('students/{id}', [StudentController::class, 'destroy'])->middleware('role:Admin,Secretary');
+
+    Route::get('roles', [RoleController::class, 'all'])->middleware('role:Admin,Secretary');
+    Route::get('roles/{id}', [RoleController::class, 'show'])->middleware('role:Admin,Secretary');
     Route::post('roles', [RoleController::class, 'store'])->middleware('role:Admin');
     Route::put('roles/{id}', [RoleController::class, 'update'])->middleware('role:Admin');
     Route::delete('roles/{id}', [RoleController::class, 'destroy'])->middleware('role:Admin');
-    Route::get('roles/{id}/permissions', [RoleController::class, 'getPermissions'])->middleware('role:Admin');
 
     Route::get('groups', [GroupController::class, 'all'])->middleware('role:Admin,Secretary');
     Route::get('groups/{id}', [GroupController::class, 'get'])->middleware('role:Admin,Secretary');
