@@ -22,13 +22,14 @@ return new class extends Migration
                 $table->foreignId('series_id')->constrained('series')->onDelete('cascade');
                 $table->integer('year');
                 $table->integer('semester');
-                $table->string('faculty');
-                $table->string('specialization');
+                $table->foreignId('faculty_id')->constrained('faculties')->onDelete('cascade');
+                $table->foreignId('speciality_id')->constrained('specialities')->onDelete('cascade');
                 $table->date('date_of_birth')->nullable();
                 $table->string('birth_place')->nullable();
                 $table->string('address')->nullable();
                 $table->string('city')->nullable();
                 $table->string('phone')->nullable();
+                $table->boolean('status')->default(0);
                 $table->timestamps();
             });
         };

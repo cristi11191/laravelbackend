@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Models\Student;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -40,6 +41,21 @@ class UserController extends Controller
         }
         return response()->json($user);
     }
+    public function toggleStatus($id)
+    {
+        // Find the user or return a 404 error
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found.'], 404);
+        }
+
+        // Toggle the user's status (active/inactive)
+        $user->status = !$user->status; // Toggle between true (active) and false (inactive)
+        $user->save();
+
+        return response()->json(['message' => 'User status updated successfully', 'status' => $user->status]);
+    }
+
 
     public function update(Request $request, $id)
     {

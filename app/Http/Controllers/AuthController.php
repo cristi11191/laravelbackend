@@ -101,7 +101,8 @@ class AuthController extends Controller
                     'email' => $userArray['email'], // Example of including email
                     'role' => [
                         'name' => $userArray['role']['name']
-                    ]
+                    ],
+                    'status' => $userArray['status']
                 ]
             ];
 

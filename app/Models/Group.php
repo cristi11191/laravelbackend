@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Group extends Model
 {
     use HasFactory;
-    protected $fillable = ['group_name'];
+    protected $fillable = ['group_name', 'year'];
     public function groups()
     {
         return $this->belongsToMany(Group::class);

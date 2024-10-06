@@ -10,7 +10,7 @@ class StudentController extends Controller
     // Get all students
     public function index()
     {
-        $students = Student::with(['user', 'group', 'series'])->get();  // Eager load relationships
+        $students = Student::with(['user', 'group', 'series', 'faculty', 'speciality'])->get();  // Eager load relationships
         return response()->json($students);
     }
 
@@ -26,13 +26,14 @@ class StudentController extends Controller
             'series_id' => 'required|exists:series,id', // Use series_id here
             'year' => 'required|integer|min:1|max:6',
             'semester' => 'required|integer|min:1|max:2',
-            'faculty' => 'required|string|max:255',
-            'specialization' => 'required|string|max:255',
+            'faculty_id' => 'required|exists:faculties,id',
+            'speciality_id' => 'required|exists:specialities,id',
             'date_of_birth' => 'nullable|date',
             'birth_place' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:15',
+            'status' => 'required|boolean',
         ]);
 
 
@@ -49,7 +50,7 @@ class StudentController extends Controller
     public function show($id)
     {
         // Find the student or return a 404 error
-        $student = Student::with(['user', 'group', 'series'])->find($id);
+        $student = Student::with(['user', 'group', 'series', 'faculty', 'speciality'])->find($id); // Eager load faculty and speciality
 
         if (!$student) {
             return response()->json(['error' => 'Student not found.'], 404);
@@ -60,7 +61,7 @@ class StudentController extends Controller
     public function showUserId($user_id)
     {
         // Find the student by user_id or return a 404 error
-        $student = Student::with(['user', 'group', 'series'])->where('user_id', $user_id)->first();
+        $student = Student::where('user_id', $user_id)->first();
 
         if (!$student) {
             return response()->json(['error' => 'Student not found.'], 404);
@@ -74,7 +75,7 @@ class StudentController extends Controller
     public function update(Request $request, $id)
     {
         // Find the student or return a 404 error
-        $student = Student::find($id);
+        $student = Student::where('user_id', $id)->first();
         if (!$student) {
             return response()->json(['error' => 'Student not found.'], 404);
         }
@@ -88,13 +89,14 @@ class StudentController extends Controller
             'series_id' => 'required|exists:series,id', // Use series_id here
             'year' => 'required|integer|min:1|max:6',
             'semester' => 'required|integer|min:1|max:2',
-            'faculty' => 'required|string|max:255',
-            'specialization' => 'required|string|max:255',
+            'faculty_id' => 'required|exists:faculties,id',
+            'speciality_id' => 'required|exists:specialities,id',
             'date_of_birth' => 'nullable|date',
             'birth_place' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:15',
+            'status' => 'required|boolean',
         ]);
 
 
@@ -103,6 +105,9 @@ class StudentController extends Controller
 
         return response()->json($student);
     }
+
+
+
 
     // Delete a student
     public function destroy($id)
